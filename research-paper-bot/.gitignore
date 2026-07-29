@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.cache/
+chroma/
+data/raw/*.pdf
+data/processed/*
+!data/processed/.gitkeep
+reports/figures/*.png
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/

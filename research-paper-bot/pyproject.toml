@@ -1,0 +1,71 @@
+[project]
+name = "rag-bot"
+version = "0.1.0"
+description = "Research Paper Answer Bot - RAG over GenAI research papers with local, open-source models"
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "langchain-core>=1.0,<2",
+    "langchain-text-splitters>=1.0,<2",
+    "langchain-chroma>=1.0",
+    "langchain-huggingface>=1.0",
+    "langchain-openai>=1.0",
+    "langchain-experimental>=0.3",
+    "chromadb>=1.0",
+    "sentence-transformers>=3.0",
+    "rank-bm25>=0.2.2",
+    "pypdf>=5.0",
+    "openai>=1.60",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "python-dotenv>=1.0",
+    "httpx>=0.27",
+    "tenacity>=9.0",
+    "numpy>=1.26",
+    "pandas>=2.2",
+    "tabulate>=0.9",
+    "matplotlib>=3.9",
+    "tqdm>=4.66",
+    "streamlit>=1.40",
+    "ddgs>=9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "jupyter>=1.1",
+    "nbconvert>=7.16",
+    "ipykernel>=6.29",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/rag_bot"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["B008"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+warn_unused_ignores = false
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+    "integration: tests that need a live LM Studio server or network",
+]
