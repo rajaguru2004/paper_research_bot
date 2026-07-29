@@ -26,7 +26,16 @@ def setup_logging(level: str | None = None) -> None:
         stream=sys.stdout,
     )
     # Third-party libraries are chatty at INFO.
-    for noisy in ("httpx", "httpcore", "urllib3", "chromadb", "sentence_transformers", "openai"):
+    for noisy in (
+        "httpx",
+        "httpcore",
+        "urllib3",
+        "chromadb",
+        "sentence_transformers",
+        "openai",
+        "primp",  # ddgs HTTP client — logs every search backend it tries
+        "ddgs",
+    ):
         logging.getLogger(noisy).setLevel(logging.WARNING)
     _CONFIGURED = True
 

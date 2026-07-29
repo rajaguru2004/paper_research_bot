@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Run the full experiment grid and write reports/experiments.md + figures.
+"""Run the full experiment grid and write reports/experiments_k{k}.md + figures.
 
 Three experiments, in the order the capstone brief asks for them:
 
@@ -21,20 +21,20 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-import matplotlib  # noqa: E402
+import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-import pandas as pd  # noqa: E402
+import matplotlib.pyplot as plt
+import pandas as pd
 
-from rag_bot.config import settings  # noqa: E402
-from rag_bot.embeddings.registry import EMBEDDING_MODELS, get_embeddings, get_spec  # noqa: E402
-from rag_bot.evaluation.retrieval_metrics import evaluate_retriever  # noqa: E402
-from rag_bot.ingest.chunking import chunk_documents, chunk_stats  # noqa: E402
-from rag_bot.ingest.loader import load_corpus  # noqa: E402
-from rag_bot.logging_utils import get_logger, set_seed, setup_logging  # noqa: E402
-from rag_bot.retrieval.factory import DESCRIPTIONS, build_retriever  # noqa: E402
-from rag_bot.store.chroma_store import build_index, get_store  # noqa: E402
+from rag_bot.config import settings
+from rag_bot.embeddings.registry import get_embeddings, get_spec
+from rag_bot.evaluation.retrieval_metrics import evaluate_retriever
+from rag_bot.ingest.chunking import chunk_documents, chunk_stats
+from rag_bot.ingest.loader import load_corpus
+from rag_bot.logging_utils import get_logger, set_seed, setup_logging
+from rag_bot.retrieval.factory import DESCRIPTIONS, build_retriever
+from rag_bot.store.chroma_store import build_index, get_store
 
 log = get_logger("experiments")
 
@@ -94,7 +94,7 @@ def main() -> int:
             }
         )
     chunk_frame = pd.DataFrame(chunk_rows)
-    best_chunker = str(chunk_frame.sort_values("MRR", ascending=False).iloc[0]["config"])
+    best_chunker = str(chunk_frame.sort_values("score", ascending=False).iloc[0]["config"])
     results["chunking"] = chunk_rows
     log.info("best chunker: %s", best_chunker)
 
@@ -121,8 +121,8 @@ def main() -> int:
             log.error("embedding %s failed: %s", key, exc)
             embed_rows.append({"config": key, "error": str(exc)[:120]})
     embed_frame = pd.DataFrame(embed_rows)
-    usable = embed_frame[embed_frame.get("MRR").notna()] if "MRR" in embed_frame else embed_frame
-    best_embed = str(usable.sort_values("MRR", ascending=False).iloc[0]["config"])
+    usable = embed_frame[embed_frame["score"].notna()] if "score" in embed_frame else embed_frame
+    best_embed = str(usable.sort_values("score", ascending=False).iloc[0]["config"])
     results["embeddings"] = embed_rows
     log.info("best embedding: %s", best_embed)
 
@@ -142,23 +142,27 @@ def main() -> int:
             log.error("strategy %s failed: %s", strategy, exc)
             strategy_rows.append({"config": strategy, "error": str(exc)[:120]})
     strategy_frame = pd.DataFrame(strategy_rows)
-    best_strategy = str(strategy_frame.sort_values("MRR", ascending=False).iloc[0]["config"])
+    best_strategy = str(strategy_frame.sort_values("score", ascending=False).iloc[0]["config"])
     results["retrieval"] = strategy_rows
     log.info("best strategy: %s", best_strategy)
 
     # ---------- figures + report ----------------------------------------
     metric_cols = [f"hit@{args.k}", "MRR", "nDCG"]
-    bar_chart(chunk_frame, "config", metric_cols, "Chunking strategy", figures / "chunking.png")
-    bar_chart(usable, "config", metric_cols, "Embedding model", figures / "embeddings.png")
     bar_chart(
-        strategy_frame.dropna(subset=["MRR"]),
+        chunk_frame, "config", metric_cols, "Chunking strategy", figures / f"chunking_k{args.k}.png"
+    )
+    bar_chart(
+        usable, "config", metric_cols, "Embedding model", figures / f"embeddings_k{args.k}.png"
+    )
+    bar_chart(
+        strategy_frame.dropna(subset=["score"]),
         "config",
         metric_cols,
         "Retrieval strategy",
-        figures / "retrieval.png",
+        figures / f"retrieval_k{args.k}.png",
     )
 
-    report_path = settings.reports_dir / "experiments.md"
+    report_path = settings.reports_dir / f"experiments_k{args.k}.md"
     report_path.write_text(
         "\n".join(
             [
@@ -166,7 +170,9 @@ def main() -> int:
                 "",
                 f"Corpus: **{load_report.files} papers**, {load_report.pages_kept} pages "
                 f"({load_report.pages_skipped} skipped as figure/cover pages). "
-                f"Metrics computed at k={args.k} over the 18 answerable gold questions.",
+                f"Metrics computed at k={args.k} over the 18 answerable gold questions. "
+                "Selection uses `score` = mean(MRR, nDCG, page_hit): MRR alone rewards ranking the "
+                "right *paper* highly even when the wrong *page* is retrieved.",
                 "",
                 "## 1. Chunking strategy (embedding fixed: bge-small, retrieval: dense)",
                 "",
@@ -174,7 +180,7 @@ def main() -> int:
                 "",
                 f"**Selected: `{best_chunker}`**",
                 "",
-                "![chunking](figures/chunking.png)",
+                f"![chunking](figures/chunking_k{args.k}.png)",
                 "",
                 f"## 2. Embedding model (chunker fixed: {best_chunker}, retrieval: dense)",
                 "",
@@ -182,7 +188,7 @@ def main() -> int:
                 "",
                 f"**Selected: `{best_embed}`**",
                 "",
-                "![embeddings](figures/embeddings.png)",
+                f"![embeddings](figures/embeddings_k{args.k}.png)",
                 "",
                 f"## 3. Retrieval strategy (embedding: {best_embed}, chunker: {best_chunker})",
                 "",
@@ -190,7 +196,7 @@ def main() -> int:
                 "",
                 f"**Selected: `{best_strategy}`**",
                 "",
-                "![retrieval](figures/retrieval.png)",
+                f"![retrieval](figures/retrieval_k{args.k}.png)",
                 "",
                 "## Final configuration",
                 "",
@@ -203,7 +209,7 @@ def main() -> int:
         ),
         encoding="utf-8",
     )
-    (settings.reports_dir / "experiments.json").write_text(
+    (settings.reports_dir / f"experiments_k{args.k}.json").write_text(
         json.dumps(
             {
                 "results": results,

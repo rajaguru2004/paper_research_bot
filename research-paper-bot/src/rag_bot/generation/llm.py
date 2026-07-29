@@ -6,6 +6,7 @@ from functools import lru_cache
 
 import httpx
 from langchain_openai import ChatOpenAI
+from pydantic import SecretStr
 
 from rag_bot.config import settings
 from rag_bot.logging_utils import get_logger
@@ -26,9 +27,9 @@ def get_llm(
     return ChatOpenAI(
         model=model or settings.llm_model,
         base_url=settings.lmstudio_base_url,
-        api_key=settings.lmstudio_api_key,
+        api_key=SecretStr(settings.lmstudio_api_key),
         temperature=settings.llm_temperature if temperature is None else temperature,
-        max_tokens=max_tokens or settings.llm_max_tokens,
+        max_completion_tokens=max_tokens or settings.llm_max_tokens,
         timeout=settings.llm_timeout,
         max_retries=2,
     )

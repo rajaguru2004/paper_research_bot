@@ -6,6 +6,7 @@ first-class ``Runnable``: streamable, batchable and inspectable.
 
 from __future__ import annotations
 
+import re
 import time
 from collections.abc import Sequence
 from dataclasses import asdict, dataclass, field
@@ -30,6 +31,30 @@ from rag_bot.retrieval.base import RetrievalStrategy
 log = get_logger(__name__)
 
 NO_ANSWER = "I don't know based on the provided papers."
+
+# Small models paraphrase the refusal instruction instead of repeating it verbatim
+# ("the information provided does not specify …"), so detection matches a *family* of phrasings
+# rather than a fixed list of sentences — enumerating literal strings is a losing game.
+_NEGATION = r"(?:does\s+not|doesn't|do\s+not|don't|cannot|can't|is\s+not|isn't|are\s+not|aren't)"
+_REPORTING_VERB = (
+    r"(?:mention|specify|contain|provide|include|state|discuss|address|cover|say|answer)"
+)
+
+REFUSAL_REGEX = re.compile(
+    r"|".join(
+        [
+            r"\bi\s+(?:don't|do\s+not)\s+know\b",
+            rf"\b{_NEGATION}\s+\w{{0,12}}\s*{_REPORTING_VERB}",  # "does not (clearly) specify"
+            r"\bno\s+(?:information|mention|details?|data)\b",
+            r"\b(?:unable|not\s+able)\s+to\s+answer\b",
+            r"\bnot\s+(?:mentioned|specified|found|covered|provided|discussed)\b",
+            r"\binsufficient\s+(?:context|information)\b",
+            r"\b(?:context|information|passages?)\s+(?:is|are)\s+insufficient\b",
+        ]
+    ),
+    re.IGNORECASE,
+)
+REFUSAL_WINDOW = 200  # hard cap on the opening inspected, for answers with no sentence break
 
 
 @dataclass
@@ -64,7 +89,14 @@ class RAGAnswer:
 
     @property
     def is_refusal(self) -> bool:
-        return self.answer.strip().lower().startswith("i don't know")
+        """True when the model declined to answer from the retrieved context.
+
+        Only the *first sentence* is inspected. A refusal is stated up front; the same wording
+        later in an answer ("… the paper does not mention overhead for r > 64") is a legitimate
+        qualification attached to a real answer, and must not be misread as a refusal.
+        """
+        first_sentence = re.split(r"(?<=[.!?])\s", self.answer.strip(), maxsplit=1)[0]
+        return bool(REFUSAL_REGEX.search(first_sentence[:REFUSAL_WINDOW]))
 
     def to_dict(self) -> dict:
         payload = asdict(self)
@@ -88,7 +120,9 @@ def build_citations(docs: Sequence[Document], snippet_chars: int = 320) -> list[
             Citation(
                 index=index,
                 title=str(meta.get("title", "Unknown")),
-                page=int(page) if isinstance(page, int | float | str) and str(page).isdigit() else None,
+                page=int(page)
+                if isinstance(page, int | float | str) and str(page).isdigit()
+                else None,
                 score=float(meta.get("retrieval_score", 0.0)),
                 snippet=doc.page_content[:snippet_chars].strip(),
                 source_type=str(meta.get("source_type", "paper")),
@@ -124,7 +158,9 @@ class RAGPipeline:
         prompt = CONVERSATIONAL_RAG_PROMPT if conversational else RAG_PROMPT
         return (
             RunnablePassthrough.assign(
-                context=RunnableLambda(lambda x: format_context(x["documents"]), name="format_context")
+                context=RunnableLambda(
+                    lambda x: format_context(x["documents"]), name="format_context"
+                )
             )
             | prompt
             | self.llm
@@ -158,7 +194,8 @@ class RAGPipeline:
         history = list(history or [])
 
         search_query = self.condense(question, history) if history else question
-        used_web, verdicts = False, []
+        used_web: bool = False
+        verdicts: list[str] = []
 
         if self._crag is not None:
             documents, used_web, verdicts = self._crag.retrieve(search_query, k)
@@ -197,7 +234,9 @@ class RAGPipeline:
             documents=documents,
         )
 
-    def stream(self, question: str, history: Sequence[BaseMessage] | None = None, k: int | None = None):
+    def stream(
+        self, question: str, history: Sequence[BaseMessage] | None = None, k: int | None = None
+    ):
         """Yield ``(token, citations)``: citations first, then the answer token by token."""
         history = list(history or [])
         search_query = self.condense(question, history) if history else question

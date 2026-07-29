@@ -62,7 +62,8 @@ def _resolve_title(path: Path, reader: PdfReader) -> tuple[str, str | None]:
     spec = SPEC_BY_FILENAME.get(path.name)
     if spec is not None:
         return spec.title, spec.arxiv_id
-    meta_title = (reader.metadata or {}).get("/Title") if reader.metadata else None
+    metadata = reader.metadata
+    meta_title = metadata.get("/Title") if metadata else None
     if meta_title and len(str(meta_title).strip()) > 8:
         return str(meta_title).strip(), None
     return path.stem.replace("_", " ").title(), None

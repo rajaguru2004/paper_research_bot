@@ -132,7 +132,7 @@ GOLD_SET: tuple[GoldQuestion, ...] = (
     ),
     GoldQuestion(
         "q16",
-        "What does the retrieval evaluator in Corrective RAG do when retrieval is judged incorrect?",
+        "What does the retrieval evaluator in Corrective RAG do when retrieval is judged wrong?",
         "Corrective Retrieval Augmented Generation",
         "multihop",
         (3, 4),

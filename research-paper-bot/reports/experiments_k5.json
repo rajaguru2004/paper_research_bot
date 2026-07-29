@@ -1,0 +1,150 @@
+{
+  "results": {
+    "chunking": [
+      {
+        "config": "fixed",
+        "k": 5,
+        "hit@5": 1.0,
+        "MRR": 0.956,
+        "nDCG": 0.954,
+        "page_hit": 0.833,
+        "latency_ms": 9.4,
+        "chunks": 1212,
+        "mean_chars": 1485,
+        "chunk_s": 5.7,
+        "index_s": 21.4
+      },
+      {
+        "config": "recursive",
+        "k": 5,
+        "hit@5": 1.0,
+        "MRR": 0.935,
+        "nDCG": 0.959,
+        "page_hit": 0.889,
+        "latency_ms": 7.7,
+        "chunks": 2100,
+        "mean_chars": 860,
+        "chunk_s": 0.1,
+        "index_s": 2.1
+      },
+      {
+        "config": "semantic",
+        "k": 5,
+        "hit@5": 1.0,
+        "MRR": 0.903,
+        "nDCG": 0.913,
+        "page_hit": 0.778,
+        "latency_ms": 11.2,
+        "chunks": 2067,
+        "mean_chars": 790,
+        "chunk_s": 61.8,
+        "index_s": 19.7
+      }
+    ],
+    "embeddings": [
+      {
+        "config": "minilm",
+        "k": 5,
+        "hit@5": 1.0,
+        "MRR": 0.944,
+        "nDCG": 0.964,
+        "page_hit": 0.889,
+        "latency_ms": 5.7,
+        "dim": 384,
+        "provider": "huggingface",
+        "index_s": 5.2
+      },
+      {
+        "config": "bge-small",
+        "k": 5,
+        "hit@5": 1.0,
+        "MRR": 0.956,
+        "nDCG": 0.954,
+        "page_hit": 0.833,
+        "latency_ms": 7.9,
+        "dim": 384,
+        "provider": "huggingface",
+        "index_s": 1.3
+      },
+      {
+        "config": "nomic",
+        "k": 5,
+        "hit@5": 1.0,
+        "MRR": 0.972,
+        "nDCG": 0.979,
+        "page_hit": 0.889,
+        "latency_ms": 13.6,
+        "dim": 768,
+        "provider": "lmstudio",
+        "index_s": 30.9
+      }
+    ],
+    "retrieval": [
+      {
+        "config": "dense",
+        "k": 5,
+        "hit@5": 1.0,
+        "MRR": 0.972,
+        "nDCG": 0.979,
+        "page_hit": 0.889,
+        "latency_ms": 12.1,
+        "description": "Cosine similarity over embeddings (baseline)."
+      },
+      {
+        "config": "mmr",
+        "k": 5,
+        "hit@5": 1.0,
+        "MRR": 0.972,
+        "nDCG": 0.965,
+        "page_hit": 0.611,
+        "latency_ms": 14.7,
+        "description": "Maximal Marginal Relevance \u2014 relevance with diversity."
+      },
+      {
+        "config": "bm25",
+        "k": 5,
+        "hit@5": 1.0,
+        "MRR": 0.928,
+        "nDCG": 0.951,
+        "page_hit": 0.889,
+        "latency_ms": 2.7,
+        "description": "Sparse lexical keyword matching."
+      },
+      {
+        "config": "hybrid",
+        "k": 5,
+        "hit@5": 1.0,
+        "MRR": 0.972,
+        "nDCG": 0.977,
+        "page_hit": 0.889,
+        "latency_ms": 17.3,
+        "description": "BM25 + dense fused with weighted Reciprocal Rank Fusion."
+      },
+      {
+        "config": "rerank",
+        "k": 5,
+        "hit@5": 1.0,
+        "MRR": 0.958,
+        "nDCG": 0.97,
+        "page_hit": 0.889,
+        "latency_ms": 719.4,
+        "description": "Hybrid candidates reranked by a cross-encoder."
+      },
+      {
+        "config": "multiquery",
+        "k": 5,
+        "hit@5": 1.0,
+        "MRR": 1.0,
+        "nDCG": 0.997,
+        "page_hit": 0.833,
+        "latency_ms": 621.6,
+        "description": "LLM query expansion, results fused with RRF."
+      }
+    ]
+  },
+  "best": {
+    "chunker": "fixed",
+    "embedding": "nomic",
+    "strategy": "multiquery"
+  }
+}

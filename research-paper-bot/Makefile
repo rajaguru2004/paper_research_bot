@@ -2,7 +2,7 @@ PY := .venv/bin/python
 PIP := uv pip
 Q ?= What is multi-head attention?
 
-.PHONY: install papers index experiments ask app test lint format notebook clean
+.PHONY: install papers index experiments ask app test lint format notebook submission clean
 
 install:
 	uv venv --python 3.12 .venv
@@ -41,6 +41,9 @@ format:
 notebook:
 	.venv/bin/jupyter nbconvert --to notebook --execute --inplace \
 		--ExecutePreprocessor.timeout=3600 notebooks/capstone.ipynb
+
+submission:
+	$(PY) scripts/package_submission.py
 
 clean:
 	rm -rf chroma .cache reports/figures/*.png

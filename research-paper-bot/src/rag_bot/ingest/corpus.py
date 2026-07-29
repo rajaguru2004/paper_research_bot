@@ -79,9 +79,7 @@ PAPERS: tuple[PaperSpec, ...] = (
         2023,
         "rag",
     ),
-    PaperSpec(
-        "2401.15884", "Corrective Retrieval Augmented Generation", 2024, "rag"
-    ),
+    PaperSpec("2401.15884", "Corrective Retrieval Augmented Generation", 2024, "rag"),
 )
 
 TITLE_BY_ID: dict[str, str] = {p.arxiv_id: p.title for p in PAPERS}

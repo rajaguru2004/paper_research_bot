@@ -9,8 +9,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from rag_bot.ingest.download import download_corpus  # noqa: E402
-from rag_bot.logging_utils import setup_logging  # noqa: E402
+from rag_bot.ingest.download import download_corpus
+from rag_bot.logging_utils import setup_logging
 
 
 def main() -> int:

@@ -81,7 +81,9 @@ EMBEDDING_MODELS: dict[str, EmbeddingSpec] = {
 class PrefixedEmbeddings(Embeddings):
     """Wraps an ``Embeddings`` and applies model-specific query/document prefixes."""
 
-    def __init__(self, inner: Embeddings, query_prefix: str = "", document_prefix: str = "") -> None:
+    def __init__(
+        self, inner: Embeddings, query_prefix: str = "", document_prefix: str = ""
+    ) -> None:
         self.inner = inner
         self.query_prefix = query_prefix
         self.document_prefix = document_prefix

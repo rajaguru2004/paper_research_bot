@@ -9,12 +9,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from rag_bot.config import settings  # noqa: E402
-from rag_bot.embeddings.registry import EMBEDDING_MODELS  # noqa: E402
-from rag_bot.ingest.chunking import CHUNKER_NAMES, chunk_documents, chunk_stats  # noqa: E402
-from rag_bot.ingest.loader import load_corpus  # noqa: E402
-from rag_bot.logging_utils import get_logger, set_seed, setup_logging  # noqa: E402
-from rag_bot.store.chroma_store import build_index  # noqa: E402
+from rag_bot.config import settings
+from rag_bot.embeddings.registry import EMBEDDING_MODELS
+from rag_bot.ingest.chunking import CHUNKER_NAMES, chunk_documents, chunk_stats
+from rag_bot.ingest.loader import load_corpus
+from rag_bot.logging_utils import get_logger, set_seed, setup_logging
+from rag_bot.store.chroma_store import build_index
 
 log = get_logger("build_index")
 
@@ -32,7 +32,10 @@ def main() -> int:
 
     documents, report = load_corpus()
     log.info(
-        "corpus: %d files, %d pages kept, %d skipped", report.files, report.pages_kept, report.pages_skipped
+        "corpus: %d files, %d pages kept, %d skipped",
+        report.files,
+        report.pages_kept,
+        report.pages_skipped,
     )
 
     chunks = chunk_documents(documents, args.chunker)

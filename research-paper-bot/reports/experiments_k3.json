@@ -1,0 +1,162 @@
+{
+  "results": {
+    "chunking": [
+      {
+        "config": "fixed",
+        "k": 3,
+        "hit@3": 0.944,
+        "MRR": 0.944,
+        "nDCG": 0.944,
+        "page_hit": 0.722,
+        "score": 0.87,
+        "latency_ms": 19.2,
+        "chunks": 1212,
+        "mean_chars": 1485,
+        "chunk_s": 0.3,
+        "index_s": 1.5
+      },
+      {
+        "config": "recursive",
+        "k": 3,
+        "hit@3": 1.0,
+        "MRR": 0.935,
+        "nDCG": 0.955,
+        "page_hit": 0.778,
+        "score": 0.889,
+        "latency_ms": 8.3,
+        "chunks": 2100,
+        "mean_chars": 860,
+        "chunk_s": 0.1,
+        "index_s": 2.0
+      },
+      {
+        "config": "semantic",
+        "k": 3,
+        "hit@3": 0.944,
+        "MRR": 0.889,
+        "nDCG": 0.894,
+        "page_hit": 0.611,
+        "score": 0.798,
+        "latency_ms": 8.7,
+        "chunks": 2067,
+        "mean_chars": 790,
+        "chunk_s": 61.5,
+        "index_s": 2.7
+      }
+    ],
+    "embeddings": [
+      {
+        "config": "minilm",
+        "k": 3,
+        "hit@3": 1.0,
+        "MRR": 0.972,
+        "nDCG": 0.974,
+        "page_hit": 0.889,
+        "score": 0.945,
+        "latency_ms": 5.9,
+        "dim": 384,
+        "provider": "huggingface",
+        "index_s": 9.0
+      },
+      {
+        "config": "bge-small",
+        "k": 3,
+        "hit@3": 1.0,
+        "MRR": 0.935,
+        "nDCG": 0.955,
+        "page_hit": 0.778,
+        "score": 0.889,
+        "latency_ms": 8.8,
+        "dim": 384,
+        "provider": "huggingface",
+        "index_s": 2.4
+      },
+      {
+        "config": "nomic",
+        "k": 3,
+        "hit@3": 1.0,
+        "MRR": 0.972,
+        "nDCG": 0.983,
+        "page_hit": 0.833,
+        "score": 0.93,
+        "latency_ms": 11.9,
+        "dim": 768,
+        "provider": "lmstudio",
+        "index_s": 35.7
+      }
+    ],
+    "retrieval": [
+      {
+        "config": "dense",
+        "k": 3,
+        "hit@3": 1.0,
+        "MRR": 0.972,
+        "nDCG": 0.974,
+        "page_hit": 0.889,
+        "score": 0.945,
+        "latency_ms": 6.1,
+        "description": "Cosine similarity over embeddings (baseline)."
+      },
+      {
+        "config": "mmr",
+        "k": 3,
+        "hit@3": 1.0,
+        "MRR": 0.963,
+        "nDCG": 0.963,
+        "page_hit": 0.833,
+        "score": 0.92,
+        "latency_ms": 7.0,
+        "description": "Maximal Marginal Relevance \u2014 relevance with diversity."
+      },
+      {
+        "config": "bm25",
+        "k": 3,
+        "hit@3": 0.944,
+        "MRR": 0.917,
+        "nDCG": 0.923,
+        "page_hit": 0.833,
+        "score": 0.891,
+        "latency_ms": 4.7,
+        "description": "Sparse lexical keyword matching."
+      },
+      {
+        "config": "hybrid",
+        "k": 3,
+        "hit@3": 1.0,
+        "MRR": 0.963,
+        "nDCG": 0.968,
+        "page_hit": 0.889,
+        "score": 0.94,
+        "latency_ms": 12.7,
+        "description": "BM25 + dense fused with weighted Reciprocal Rank Fusion."
+      },
+      {
+        "config": "rerank",
+        "k": 3,
+        "hit@3": 1.0,
+        "MRR": 0.972,
+        "nDCG": 0.979,
+        "page_hit": 0.889,
+        "score": 0.947,
+        "latency_ms": 592.5,
+        "description": "Hybrid candidates reranked by a cross-encoder."
+      },
+      {
+        "config": "multiquery",
+        "k": 3,
+        "hit@3": 1.0,
+        "MRR": 0.972,
+        "nDCG": 0.979,
+        "page_hit": 0.722,
+        "score": 0.891,
+        "latency_ms": 586.1,
+        "description": "LLM query expansion, results fused with RRF."
+      }
+    ]
+  },
+  "best": {
+    "chunker": "recursive",
+    "embedding": "minilm",
+    "strategy": "rerank"
+  }
+}

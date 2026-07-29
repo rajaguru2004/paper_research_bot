@@ -21,7 +21,7 @@ from rag_bot.logging_utils import get_logger
 log = get_logger(__name__)
 
 
-class Grade(str, Enum):
+class Grade(str, Enum):  # noqa: UP042 - str mixin keeps grades JSON-serialisable
     RELEVANT = "relevant"
     IRRELEVANT = "irrelevant"
     UNKNOWN = "unknown"  # grader failed — treated as relevant downstream

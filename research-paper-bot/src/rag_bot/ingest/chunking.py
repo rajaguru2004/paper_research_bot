@@ -112,7 +112,9 @@ CHUNKERS: dict[str, Callable[..., list[Document]]] = {
 }
 
 
-def chunk_documents(docs: Sequence[Document], strategy: str | None = None, **kwargs) -> list[Document]:
+def chunk_documents(
+    docs: Sequence[Document], strategy: str | None = None, **kwargs
+) -> list[Document]:
     """Dispatch to a chunking strategy by name."""
     strategy = strategy or settings.chunker
     if strategy not in CHUNKERS:

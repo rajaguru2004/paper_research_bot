@@ -40,7 +40,9 @@ JUDGE_PROMPT = ChatPromptTemplate.from_messages(
 )
 
 CRITERIA = {
-    "faithfulness": "Every claim in the answer is supported by the context. Unsupported claims score 1.",
+    "faithfulness": (
+        "Every claim in the answer is supported by the context. Unsupported claims score 1."
+    ),
     "relevance": "The answer addresses the question directly and completely.",
     "citation_use": "The answer cites sources with [n] markers where claims are made.",
 }
@@ -102,9 +104,7 @@ class AnswerJudge:
             return score
 
         context = format_context(result.documents)
-        score.cited_expected_paper = any(
-            c.title == gold.expected_title for c in result.citations
-        )
+        score.cited_expected_paper = any(c.title == gold.expected_title for c in result.citations)
         if result.is_refusal:
             score.scores = dict.fromkeys(CRITERIA, 1.0)
             return score

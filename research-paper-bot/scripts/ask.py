@@ -9,11 +9,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from rag_bot.config import settings  # noqa: E402
-from rag_bot.generation.chain import build_pipeline  # noqa: E402
-from rag_bot.generation.llm import health_check  # noqa: E402
-from rag_bot.logging_utils import setup_logging  # noqa: E402
-from rag_bot.retrieval.factory import STRATEGIES  # noqa: E402
+from rag_bot.config import settings
+from rag_bot.generation.chain import build_pipeline
+from rag_bot.generation.llm import health_check
+from rag_bot.logging_utils import setup_logging
+from rag_bot.retrieval.factory import STRATEGIES
 
 
 def main() -> int:
@@ -38,7 +38,9 @@ def main() -> int:
     print("\n" + result.pretty())
     if args.snippets:
         for citation in result.citations:
-            print(f"\n--- [{citation.index}] {citation.title} p.{citation.page}\n{citation.snippet}")
+            print(
+                f"\n--- [{citation.index}] {citation.title} p.{citation.page}\n{citation.snippet}"
+            )
     return 0
 
 

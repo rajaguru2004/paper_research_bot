@@ -74,6 +74,16 @@ class RetrievalEval:
     n_questions: int
     per_question: list[dict] = field(default_factory=list)
 
+    @property
+    def composite(self) -> float:
+        """Single selection score: mean of MRR, nDCG and page_hit.
+
+        Selecting on MRR alone rewards configurations that rank the right *paper* highly while
+        retrieving the wrong *page* — MMR is exactly that failure. Averaging in page_hit keeps the
+        decision tied to what the user is shown: the passage, not just the document.
+        """
+        return float(np.mean([self.mrr, self.ndcg, self.page_hit_rate]))
+
     def row(self) -> dict:
         return {
             "config": self.label,
@@ -82,6 +92,7 @@ class RetrievalEval:
             "MRR": round(self.mrr, 3),
             "nDCG": round(self.ndcg, 3),
             "page_hit": round(self.page_hit_rate, 3),
+            "score": round(self.composite, 3),
             "latency_ms": round(self.mean_latency_ms, 1),
         }
 

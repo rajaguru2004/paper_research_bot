@@ -1,0 +1,35 @@
+flowchart LR
+    subgraph INGEST["1 · Ingestion (offline)"]
+        A[arXiv PDFs<br/>15 papers] --> B[pypdf loader<br/>1 Document per page]
+        B --> C[clean text<br/>ligatures · hyphen joins]
+        C --> D[chunking<br/>fixed · recursive · semantic]
+        D --> E[embed<br/>minilm · bge-small · nomic]
+        E --> F[(ChromaDB<br/>1 collection per<br/>model x chunker)]
+    end
+
+    subgraph RETRIEVE["2 · Retrieval (per query)"]
+        Q([user question]) --> CQ[condense with<br/>chat history]
+        CQ --> R1[dense / MMR]
+        CQ --> R2[BM25]
+        R1 --> RRF[weighted RRF fusion]
+        R2 --> RRF
+        RRF --> RR[cross-encoder<br/>rerank]
+        F -.-> R1
+        F -.-> R2
+    end
+
+    subgraph CRAG["3 · Corrective RAG"]
+        RR --> G{grade each<br/>passage}
+        G -->|relevant| CTX[top-3 context]
+        G -->|weak| W[DuckDuckGo<br/>web search]
+        W --> CTX
+    end
+
+    subgraph GEN["4 · Generation"]
+        CTX --> P[grounded prompt<br/>numbered context]
+        P --> L[LLM via LM Studio<br/>OpenAI-compatible]
+        L --> ANS[answer + top-3 citations<br/>title · page · score]
+    end
+
+    ANS --> M[(session memory)]
+    M -.-> CQ

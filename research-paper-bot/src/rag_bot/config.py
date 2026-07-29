@@ -34,7 +34,7 @@ class Settings(BaseSettings):
 
     # --- Embeddings -----------------------------------------------------------
     # Key into rag_bot.embeddings.registry.EMBEDDING_MODELS
-    embed_model: str = Field(default="bge-small")
+    embed_model: str = Field(default="minilm")
     lmstudio_embed_model: str = Field(default="text-embedding-nomic-embed-text-v1.5")
     embed_batch_size: int = Field(default=32)
     embed_device: str = Field(default="auto")  # auto | cpu | cuda
